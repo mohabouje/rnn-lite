@@ -84,9 +84,10 @@ namespace rnn { inline namespace activation {
          */
         template <std::size_t N>
         constexpr value_type derivative(value_type y) const {
+            static_assert(N > 0 && N < 3, "Not implemented yet");
             if constexpr (N == 1) {
                 return 1 - square(y);
-            } else {
+            } else if constexpr (N == 2){
                 return -2 * y * derivative<1>(y);
             }
         }
