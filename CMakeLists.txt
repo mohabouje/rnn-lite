@@ -44,4 +44,5 @@ install(FILES
 install(DIRECTORY include/ DESTINATION include)
 
 
+enable_testing()
 add_subdirectory(test)
