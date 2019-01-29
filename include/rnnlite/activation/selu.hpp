@@ -40,14 +40,14 @@
 namespace rnn { inline namespace activation {
 
     /**
-         * A SELU (Scaled Exponential linear unit) function in the context of artificial neural networks
-         * is defined as:
-         *
-         * \f[
-         * {\displaystyle f(\alpha ,x)=\lambda {\begin{cases}\alpha (e^{x}-1)&{\text{for }}x<0\\x&{\text{for }}x\geq 0\end{cases}}}
-         * \f]
-         * @tparam T Numeric type.
-         */
+     * A SELU (Scaled Exponential linear unit) function in the context of artificial neural networks
+     * is defined as:
+     *
+     * \f[
+     * {\displaystyle f(\alpha ,x)=\lambda {\begin{cases}\alpha (e^{x}-1)&{\text{for }}x<0\\x&{\text{for }}x\geq 0\end{cases}}}
+     * \f]
+     * @tparam T Numeric type.
+     */
     template <typename T>
     struct selu {
         using value_type = T;
