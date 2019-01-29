@@ -35,11 +35,13 @@
 #define RNNLITE_IDENTITY_HPP
 
 #include <cstddef>
+#include <limits>
+#include <utility>
 
 namespace rnn { inline namespace activation {
 
         /**
-         * A identity function is an activation function that converges polynomially, with equation:
+         * A identity function is the simplest activation function, with equation:
          *
          * \f[
          * {\displaystyle f(x) = x}
@@ -50,6 +52,13 @@ namespace rnn { inline namespace activation {
         template <typename T>
         struct identity {
             using value_type = T;
+
+            /**
+             * @brief Range of the possible output values.
+             */
+            inline static constexpr auto range = std::make_pair<value_type, value_type>(
+                    std::numeric_limits<value_type>::infinity(),
+                    -std::numeric_limits<value_type>::infinity());
 
             /**
              * @brief Evaluates the identity function of the input value.

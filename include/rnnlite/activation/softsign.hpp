@@ -53,6 +53,11 @@ namespace rnn { inline namespace activation {
             using value_type = T;
 
             /**
+             * @brief Range of the possible output values.
+             */
+            inline static constexpr auto range = std::make_pair<value_type, value_type>(-1, 1);
+
+            /**
              * @brief Evaluates the softsign function of the input value.
              * @param x Input value.
              * @return Returns the result of applying the softsign function to the input value.
@@ -62,9 +67,9 @@ namespace rnn { inline namespace activation {
                     if (x > -std::numeric_limits<value_type>::max()) {
                         return x / (1.0 + std::fabs(x));
                     }
-                    return -1;
+                    return range.first;
                 }
-                return 1;
+                return range.second;
             }
 
             /**

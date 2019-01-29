@@ -1,5 +1,5 @@
 /*
-* rnn-lite, Yet another framework for building deep RNN networks written in modern C++.
+* rnnlite, Yet another framework for building deep RNN networks written in modern C++.
 *
 * The 2-Clause BSD License
 *
@@ -26,59 +26,50 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: logistic.hpp
+* Filename: tanh.hpp
 * Author: Mohammed Boujemaoui
 * Date: 29/01/19
 */
 
-#ifndef RNN_LITE_LOGISTIC_HPP
-#define RNN_LITE_LOGISTIC_HPP
+#ifndef RNNLITE_TANH_HPP
+#define RNNLITE_TANH_HPP
 
 #include <rnnlite/util/limits.hpp>
-#include <utility>
+#include <rnnlite/util/math.hpp>
 
 namespace rnn { inline namespace activation {
 
     /**
-     * A logistic function or logistic curve is a common "S" shape (sigmoid curve), with equation:
+     * A tanh (Hyperbolic Tangent Activation Function) function like the logistic sigmoid,
+     * is also sigmoidal (“s”-shaped), but instead outputs values that range (-1, 1), with equation:
      *
      * \f[
-     * {\displaystyle f(x)={\frac {L}{1+e^{-k(x-x_{0})}}}} {\displaystyle f(x)={\frac {L}{1+e^{-k(x-x_{0})}}}}
+     * \Large{\begin{array}{rcl} g_{\text{tanh}}(z) &=& \frac{\text{sinh}(z)}{\text{cosh}(z)}
+     * \\  &=& \frac{\mathrm{e}^z - \mathrm{e}^{-z}}{\mathrm{e}^z + \mathrm{e}^{-z}}\end{array}}
      * \f]
-     *
-     * where:
-     *
-     * - e = the natural logarithm base (also known as Euler's number)
-     * - x0 = the x-value of the sigmoid's midpoint,
-     * - L = the curve's maximum value
-     * - k = the logistic growth rate or steepness of the curve.
-     *
-     * This class implements a standard logistic function (k = 1, x0 = 0, L = 1) which yields
-     *
-     * \f[
-     * {\displaystyle {\begin{aligned}f(x)&={\frac {1}{1+e^{-x}}}\\&={\frac {e^{x}}{e^{x}+1}}\\&
-     *          ={\tfrac {1}{2}}+{\tfrac {1}{2}}\tanh({\tfrac {x}{2}})\\\end{aligned}}}￼
-     * \f]
+
      * @tparam T Numeric type.
      */
     template <typename T>
-    struct logistic {
+    struct tanh {
         using value_type = T;
 
         /**
          * @brief Range of the possible output values.
          */
-        inline static constexpr auto range = std::make_pair<value_type, value_type>(0, 1);
+        inline static constexpr auto range = std::make_pair<value_type, value_type>(-1, 1);
 
         /**
-         * @brief Evaluates the logistic function of the input value.
+         * @brief Evaluates the tanh function of the input value.
          * @param x Input value.
-         * @return Returns the result of applying the logistic function to the input value.
+         * @return Returns the result of applying the tanh function to the input value.
          */
         constexpr value_type operator()(value_type x) const {
             if (x < log_traits<value_type>::maximum()) {
                 if (x > log_traits<value_type>::minimum()) {
-                    return 1.0 / (1.0 + std::exp(-x));
+                    const auto negative = std::exp(-x);
+                    const auto positive = std::exp(x);
+                    return (positive - negative) / (positive + negative);
                 }
                 return range.first;
             }
@@ -88,16 +79,15 @@ namespace rnn { inline namespace activation {
         /**
          * @brief Computes the nth-derivative.
          * @tparam N Order of the derivative.
-         * @param y Input value, obtained from the execution of the logistic function y = f(x)
-         * @return Returns the nth-derivative of the logistic function.
+         * @param y Input value, obtained from the execution of the tanh function y = f(x)
+         * @return Returns the nth-derivative of the tanh function.
          */
         template <std::size_t N>
         constexpr value_type derivative(value_type y) const {
-            static_assert(N > 0 && N < 3, "Not implemented yet");
             if constexpr (N == 1) {
-                return y * (1.0 - y);
-            } else if constexpr (N == 2) {
-                return derivative<1>(y) * (1 - (2 * y));
+                return 1 - square(y);
+            } else {
+                return -2 * y * derivative<1>(y);
             }
         }
 
@@ -106,4 +96,5 @@ namespace rnn { inline namespace activation {
 
 }}
 
-#endif //RNN_LITE_LOGISTIC_HPP
+
+#endif //RNNLITE_TANH_HPP

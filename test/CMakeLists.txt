@@ -8,7 +8,8 @@ find_package(GTest REQUIRED)
 set(SOURCE_FILES
         testing_gtest.cpp
         activation/testing_logistic.cpp
-        activation/testing_softsign.cpp)
+        activation/testing_softsign.cpp
+        activation/testing_tanh.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} rnnlite ${GTEST_LIBRARIES} -pthread)
