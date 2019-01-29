@@ -5,12 +5,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-
 set(LIB_NAME ${PROJECT_NAME})
 set(VERSION_MAJOR  0)
 set(VERSION_MINOR  0)
 set(VERSION_PATCH  1)
 set(LIB_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+
+option(ENABLE_COVERAGE "Enable the code coverage" ON)
+
+if (ENABLE_COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -fprofile-arcs -coverage")
+endif(ENABLE_COVERAGE)
 
 add_library(${LIB_NAME} INTERFACE)
 target_sources(${LIB_NAME} INTERFACE

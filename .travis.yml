@@ -1,0 +1,51 @@
+language: cpp
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: true
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+          - gcc-7
+          - g++-7
+          - cmake
+          - lcov
+          - libgtest-dev
+          sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-trusty-5.0
+      env:
+          - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+branches:
+  only:
+  - master
+
+env:
+  global:
+    - CODECOV_TOKEN =: "79abf62e-3e87-401c-bf7c-cbeb953a23c3"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-5 90
+  - cd /usr/src/gtest
+  - sudo cmake CMakeLists.txt
+  - sudo make
+  - sudo cp *.a /usr/lib
+  - cd -
+
+notifications:
+  email: false
+
+script:
+  - cd ${TRAVIS_BUILD_DIR}
+  - sh travis.sh
+
+after_success:
+  - cd ${TRAVIS_BUILD_DIR}
+  - lcov --directory . --capture --output-file coverage.info
+  - lcov --remove coverage.info '/usr/*' --output-file coverage.info
+  - lcov --list coverage.info
+  - bash <(curl -s https://codecov.io/bash)
