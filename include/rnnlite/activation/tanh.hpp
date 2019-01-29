@@ -47,7 +47,6 @@ namespace rnn { inline namespace activation {
      * \Large{\begin{array}{rcl} g_{\text{tanh}}(z) &=& \frac{\text{sinh}(z)}{\text{cosh}(z)}
      * \\  &=& \frac{\mathrm{e}^z - \mathrm{e}^{-z}}{\mathrm{e}^z + \mathrm{e}^{-z}}\end{array}}
      * \f]
-
      * @tparam T Numeric type.
      */
     template <typename T>
@@ -87,15 +86,12 @@ namespace rnn { inline namespace activation {
             static_assert(N > 0 && N < 3, "Not implemented yet");
             if constexpr (N == 1) {
                 return 1 - square(y);
-            } else if constexpr (N == 2){
+            } else if constexpr (N == 2) {
                 return -2 * y * derivative<1>(y);
             }
         }
-
     };
 
-
-}}
-
+}} // namespace rnn::activation
 
 #endif //RNNLITE_TANH_HPP

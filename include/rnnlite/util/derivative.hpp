@@ -43,7 +43,6 @@ namespace rnn {
         return functor.template derivative<N>(functor(value));
     };
 
-
-}
+} // namespace rnn
 
 #endif //RNNLITE_DERIVATIVE_HPP

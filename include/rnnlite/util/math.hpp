@@ -46,9 +46,8 @@ namespace rnn {
     template <class T>
     constexpr T sign(T t) {
         return t < 0 ? -1 : (t > 0 ? 1 : 0);
-
     }
 
-}
+} // namespace rnn
 
 #endif //RNNLITE_MATH_HPP

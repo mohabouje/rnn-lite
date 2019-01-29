@@ -39,60 +39,58 @@
 
 namespace rnn { inline namespace activation {
 
+    /**
+     * A ELU (Exponential linear unit) function in the context of artificial neural networks
+     * is defined as:
+     *
+     * \f[
+     * {\displaystyle f(\alpha ,x)={\begin{cases}\alpha (e^{x}-1)&{\text{for }}x\leq 0\\x&{\text{for }}x>0\end{cases}}}
+     * \f]
+     * @tparam T Numeric type.
+     */
+    template <typename T>
+    struct elu {
+        using value_type = T;
+
         /**
-         * A ELU (Exponential linear unit) function in the context of artificial neural networks
-         * is defined as:
-         *
-         * \f[
-         * {\displaystyle f(\alpha ,x)={\begin{cases}\alpha (e^{x}-1)&{\text{for }}x\leq 0\\x&{\text{for }}x>0\end{cases}}}
-         * \f]
-         * @tparam T Numeric type.
+         * @brief Range of the possible output values.
          */
-        template <typename T>
-        struct elu {
-            using value_type = T;
+        inline static constexpr auto range =
+            std::make_pair<value_type, value_type>(0, std::numeric_limits<value_type>::infinity());
+        /**
+         * @brief Creates an elu activation function.
+         * @param alpha Tune parameter to configure the activation function.
+         */
+        explicit elu(value_type alpha = 1.0) : alpha_(alpha) {}
 
-            /**
-             * @brief Range of the possible output values.
-             */
-            inline static constexpr auto range = std::make_pair<value_type, value_type>(0,
-                                                                                        std::numeric_limits<value_type>::infinity());
-            /**
-             * @brief Creates an elu activation function.
-             * @param alpha Tune parameter to configure the activation function.
-             */
-            explicit elu(value_type alpha = 1.0) : alpha_(alpha) {}
+        /**
+         * @brief Evaluates the elu function of the input value.
+         * @param x Input value.
+         * @return Returns the result of applying the elu function to the input value.
+         */
+        constexpr value_type operator()(value_type x) const {
+            return x > 0 ? x : alpha_ * (std::exp(x) - 1);
+        }
 
-            /**
-             * @brief Evaluates the elu function of the input value.
-             * @param x Input value.
-             * @return Returns the result of applying the elu function to the input value.
-             */
-            constexpr value_type operator()(value_type x) const {
-                return x > 0 ? x : alpha_ * (std::exp(x) - 1);
+        /**
+         * @brief Computes the nth-derivative.
+         * @tparam N Order of the derivative.
+         * @param y Input value, obtained from the execution of the elu function y = f(x)
+         * @return Returns the nth-derivative of the elu function.
+         */
+        template <std::size_t N>
+        constexpr value_type derivative(value_type y) const {
+            if constexpr (N == 1) {
+                return y > 0 ? 1 : y + alpha_;
+            } else {
+                return y > 0 ? 0 : y + alpha_;
             }
+        }
 
-            /**
-             * @brief Computes the nth-derivative.
-             * @tparam N Order of the derivative.
-             * @param y Input value, obtained from the execution of the elu function y = f(x)
-             * @return Returns the nth-derivative of the elu function.
-             */
-            template <std::size_t N>
-            constexpr value_type derivative(value_type y) const {
-                if constexpr (N == 1) {
-                    return y > 0 ? 1 : y + alpha_;
-                } else {
-                    return y > 0 ? 0 : y + alpha_;
-                }
-            }
+    private:
+        value_type alpha_;
+    };
 
-        private:
-            value_type alpha_;
-        };
-
-
-    }}
-
+}} // namespace rnn::activation
 
 #endif //RNNLITE_ELU_HPP

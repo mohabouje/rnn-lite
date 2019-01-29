@@ -100,10 +100,8 @@ namespace rnn { inline namespace activation {
                 return derivative<1>(y) * (1 - (2 * y));
             }
         }
-
     };
 
-
-}}
+}} // namespace rnn::activation
 
 #endif //RNN_LITE_LOGISTIC_HPP

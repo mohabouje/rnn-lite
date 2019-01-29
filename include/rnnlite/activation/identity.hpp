@@ -40,53 +40,50 @@
 
 namespace rnn { inline namespace activation {
 
+    /**
+     * A identity function is the simplest activation function, with equation:
+     *
+     * \f[
+     * {\displaystyle f(x) = x}
+     * \f]
+
+     * @tparam T Numeric type.
+     */
+    template <typename T>
+    struct identity {
+        using value_type = T;
+
         /**
-         * A identity function is the simplest activation function, with equation:
-         *
-         * \f[
-         * {\displaystyle f(x) = x}
-         * \f]
-
-         * @tparam T Numeric type.
+         * @brief Range of the possible output values.
          */
-        template <typename T>
-        struct identity {
-            using value_type = T;
+        inline static constexpr auto range = std::make_pair<value_type, value_type>(
+            std::numeric_limits<value_type>::infinity(), -std::numeric_limits<value_type>::infinity());
 
-            /**
-             * @brief Range of the possible output values.
-             */
-            inline static constexpr auto range = std::make_pair<value_type, value_type>(
-                    std::numeric_limits<value_type>::infinity(),
-                    -std::numeric_limits<value_type>::infinity());
+        /**
+         * @brief Evaluates the identity function of the input value.
+         * @param x Input value.
+         * @return Returns the result of applying the identity function to the input value.
+         */
+        constexpr value_type operator()(value_type x) const {
+            return x;
+        }
 
-            /**
-             * @brief Evaluates the identity function of the input value.
-             * @param x Input value.
-             * @return Returns the result of applying the identity function to the input value.
-             */
-            constexpr value_type operator()(value_type x) const {
-                return x;
+        /**
+         * @brief Computes the nth-derivative.
+         * @tparam N Order of the derivative.
+         * @param y Input value, obtained from the execution of the identity function y = f(x)
+         * @return Returns the nth-derivative of the identity function.
+         */
+        template <std::size_t N>
+        constexpr value_type derivative(value_type y) const {
+            if constexpr (N == 1) {
+                return 1;
+            } else {
+                return 0;
             }
+        }
+    };
 
-            /**
-             * @brief Computes the nth-derivative.
-             * @tparam N Order of the derivative.
-             * @param y Input value, obtained from the execution of the identity function y = f(x)
-             * @return Returns the nth-derivative of the identity function.
-             */
-            template <std::size_t N>
-            constexpr value_type derivative(value_type y) const {
-                if constexpr (N == 1) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-
-        };
-
-
-    }}
+}} // namespace rnn::activation
 
 #endif //RNNLITE_IDENTITY_HPP

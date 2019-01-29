@@ -50,9 +50,8 @@ namespace rnn {
         static constexpr value_type minimum() {
             return -std::log(std::numeric_limits<value_type>::max());
         }
-
     };
 
-}
+} // namespace rnn
 
 #endif //RNN_LITE_LIMITS_HPP

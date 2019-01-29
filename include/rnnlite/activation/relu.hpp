@@ -39,52 +39,50 @@
 
 namespace rnn { inline namespace activation {
 
+    /**
+     * A ReLU (Rectified linear unit) function in the context of artificial neural networks,
+     * the rectifier is an activation function defined as the positive part of its argument:
+     *
+     * \f[
+     * {\displaystyle f(x)=x^{+}=\max(0,x)} {\displaystyle f(x)=x^{+}=\max(0,x)},
+     * \f]
+     * @tparam T Numeric type.
+     */
+    template <typename T>
+    struct relu {
+        using value_type = T;
+
         /**
-         * A ReLU (Rectified linear unit) function in the context of artificial neural networks,
-         * the rectifier is an activation function defined as the positive part of its argument:
-         *
-         * \f[
-         * {\displaystyle f(x)=x^{+}=\max(0,x)} {\displaystyle f(x)=x^{+}=\max(0,x)},
-         * \f]
-         * @tparam T Numeric type.
+         * @brief Range of the possible output values.
          */
-        template <typename T>
-        struct relu {
-            using value_type = T;
+        inline static constexpr auto range =
+            std::make_pair<value_type, value_type>(0, std::numeric_limits<value_type>::infinity());
 
-            /**
-             * @brief Range of the possible output values.
-             */
-            inline static constexpr auto range = std::make_pair<value_type, value_type>(0,
-                    std::numeric_limits<value_type>::infinity());
+        /**
+         * @brief Evaluates the relu function of the input value.
+         * @param x Input value.
+         * @return Returns the result of applying the relu function to the input value.
+         */
+        constexpr value_type operator()(value_type x) const {
+            return x >= 0 ? x : 0;
+        }
 
-            /**
-             * @brief Evaluates the relu function of the input value.
-             * @param x Input value.
-             * @return Returns the result of applying the relu function to the input value.
-             */
-            constexpr value_type operator()(value_type x) const {
-                return x >= 0 ? x : 0;
+        /**
+         * @brief Computes the nth-derivative.
+         * @tparam N Order of the derivative.
+         * @param y Input value, obtained from the execution of the relu function y = f(x)
+         * @return Returns the nth-derivative of the relu function.
+         */
+        template <std::size_t N>
+        constexpr value_type derivative(value_type y) const {
+            if constexpr (N == 1) {
+                return y >= 0 ? 1 : 0;
+            } else {
+                return 0;
             }
+        }
+    };
 
-            /**
-             * @brief Computes the nth-derivative.
-             * @tparam N Order of the derivative.
-             * @param y Input value, obtained from the execution of the relu function y = f(x)
-             * @return Returns the nth-derivative of the relu function.
-             */
-            template <std::size_t N>
-            constexpr value_type derivative(value_type y) const {
-                if constexpr (N == 1) {
-                    return y >= 0 ? 1 : 0;
-                } else {
-                    return 0;
-                }
-            }
-
-        };
-
-
-    }}
+}} // namespace rnn::activation
 
 #endif //RNNLITE_RELU_HPP

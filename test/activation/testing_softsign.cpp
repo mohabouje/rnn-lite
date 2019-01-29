@@ -53,7 +53,6 @@ TEST(SoftSignFunction, SoftSignFunction_NegativeNumber_Test) {
     EXPECT_NEAR(function(-75.52), -0.986931521170, 1e-8);
 }
 
-
 TEST(SoftSignFunction, SoftSignFunction_FirstDerivative) {
     auto function = rnn::activation::softsign<double>{};
 

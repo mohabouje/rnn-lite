@@ -39,7 +39,7 @@
 
 namespace rnn { inline namespace activation {
 
-        /**
+    /**
          * A SELU (Scaled Exponential linear unit) function in the context of artificial neural networks
          * is defined as:
          *
@@ -48,52 +48,50 @@ namespace rnn { inline namespace activation {
          * \f]
          * @tparam T Numeric type.
          */
-        template <typename T>
-        struct selu {
-            using value_type = T;
+    template <typename T>
+    struct selu {
+        using value_type = T;
 
-            /**
-             * @brief Range of the possible output values.
-             */
-            inline static constexpr auto range = std::make_pair<value_type, value_type>(0,
-                                                                                        std::numeric_limits<value_type>::infinity());
-            /**
-             * @brief Creates an selu activation function.
-             * @param alpha Tune parameter to configure the activation function.
-             */
-            explicit selu(value_type lambda = 1.0507, value_type alpha = 1.67326)
-                    : alpha_(alpha), lambda_(lambda) {}
+        /**
+         * @brief Range of the possible output values.
+         */
+        inline static constexpr auto range =
+            std::make_pair<value_type, value_type>(0, std::numeric_limits<value_type>::infinity());
+        /**
+         * @brief Creates an selu activation function.
+         * @param alpha Tune parameter to configure the activation function.
+         */
+        explicit selu(value_type lambda = 1.0507, value_type alpha = 1.67326) : alpha_(alpha), lambda_(lambda) {}
 
-            /**
-             * @brief Evaluates the selu function of the input value.
-             * @param x Input value.
-             * @return Returns the result of applying the selu function to the input value.
-             */
-            constexpr value_type operator()(value_type x) const {
-                return lambda_ * (x > 0 ? x : alpha_ * (std::exp(x) - 1));
+        /**
+         * @brief Evaluates the selu function of the input value.
+         * @param x Input value.
+         * @return Returns the result of applying the selu function to the input value.
+         */
+        constexpr value_type operator()(value_type x) const {
+            return lambda_ * (x > 0 ? x : alpha_ * (std::exp(x) - 1));
+        }
+
+        /**
+         * @brief Computes the nth-derivative.
+         * @tparam N Order of the derivative.
+         * @param y Input value, obtained from the execution of the selu function y = f(x)
+         * @return Returns the nth-derivative of the selu function.
+         */
+        template <std::size_t N>
+        constexpr value_type derivative(value_type y) const {
+            if constexpr (N == 1) {
+                return lambda_ * (y > 0 ? 1 : y + alpha_);
+            } else {
+                return lambda_ * (y > 0 ? 0 : y + alpha_);
             }
+        }
 
-            /**
-             * @brief Computes the nth-derivative.
-             * @tparam N Order of the derivative.
-             * @param y Input value, obtained from the execution of the selu function y = f(x)
-             * @return Returns the nth-derivative of the selu function.
-             */
-            template <std::size_t N>
-            constexpr value_type derivative(value_type y) const {
-                if constexpr (N == 1) {
-                    return lambda_ * (y > 0 ? 1 : y + alpha_);
-                } else {
-                    return lambda_ * (y > 0 ? 0 : y + alpha_);
-                }
-            }
+    private:
+        value_type alpha_;
+        value_type lambda_;
+    };
 
-        private:
-            value_type alpha_;
-            value_type lambda_;
-        };
-
-
-    }}
+}} // namespace rnn::activation
 
 #endif //RNNLITE_SELU_HPP

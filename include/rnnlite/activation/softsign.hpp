@@ -39,58 +39,56 @@
 
 namespace rnn { inline namespace activation {
 
+    /**
+     * A softsign function is an activation function that converges polynomially, with equation:
+     *
+     * \f[
+     * {\displaystyle f(x)={\frac {x}{1+|x|}}}
+     * \f]
+
+     * @tparam T Numeric type.
+     */
+    template <typename T>
+    struct softsign {
+        using value_type = T;
+
         /**
-         * A softsign function is an activation function that converges polynomially, with equation:
-         *
-         * \f[
-         * {\displaystyle f(x)={\frac {x}{1+|x|}}}
-         * \f]
-
-         * @tparam T Numeric type.
+         * @brief Range of the possible output values.
          */
-        template <typename T>
-        struct softsign {
-            using value_type = T;
+        inline static constexpr auto range = std::make_pair<value_type, value_type>(-1, 1);
 
-            /**
-             * @brief Range of the possible output values.
-             */
-            inline static constexpr auto range = std::make_pair<value_type, value_type>(-1, 1);
-
-            /**
-             * @brief Evaluates the softsign function of the input value.
-             * @param x Input value.
-             * @return Returns the result of applying the softsign function to the input value.
-             */
-            constexpr value_type operator()(value_type x) const {
-                if (x < std::numeric_limits<value_type>::max()) {
-                    if (x > -std::numeric_limits<value_type>::max()) {
-                        return x / (1.0 + std::fabs(x));
-                    }
-                    return range.first;
+        /**
+         * @brief Evaluates the softsign function of the input value.
+         * @param x Input value.
+         * @return Returns the result of applying the softsign function to the input value.
+         */
+        constexpr value_type operator()(value_type x) const {
+            if (x < std::numeric_limits<value_type>::max()) {
+                if (x > -std::numeric_limits<value_type>::max()) {
+                    return x / (1.0 + std::fabs(x));
                 }
-                return range.second;
+                return range.first;
             }
+            return range.second;
+        }
 
-            /**
-             * @brief Computes the nth-derivative.
-             * @tparam N Order of the derivative.
-             * @param y Input value, obtained from the execution of the softsign function y = f(x)
-             * @return Returns the nth-derivative of the softsign function.
-             */
-            template <std::size_t N>
-            constexpr value_type derivative(value_type y) const {
-                static_assert(N > 0 && N < 3, "Not implemented yet");
-                if constexpr (N == 1) {
-                    return square(1.0 - std::fabs(y));
-                } else if constexpr (N == 2) {
-                    return -2 * sign(y) * std::pow((1 - std::fabs(y)), 3);
-                }
+        /**
+         * @brief Computes the nth-derivative.
+         * @tparam N Order of the derivative.
+         * @param y Input value, obtained from the execution of the softsign function y = f(x)
+         * @return Returns the nth-derivative of the softsign function.
+         */
+        template <std::size_t N>
+        constexpr value_type derivative(value_type y) const {
+            static_assert(N > 0 && N < 3, "Not implemented yet");
+            if constexpr (N == 1) {
+                return square(1.0 - std::fabs(y));
+            } else if constexpr (N == 2) {
+                return -2 * sign(y) * std::pow((1 - std::fabs(y)), 3);
             }
+        }
+    };
 
-        };
-
-
-    }}
+}} // namespace rnn::activation
 
 #endif //RNNLITE_SOFTSIGN_HPP
