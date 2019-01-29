@@ -56,7 +56,7 @@ namespace rnn { inline namespace loss {
             const auto N      = static_cast<value_type>(std::distance(first1, last1));
             value_type result = 0;
             for (; first1 != last1; ++first1, ++first2) {
-                result += -first2 * std::log(first1);
+                result += -(*first2) * std::log(*first1);
             }
             return result;
         }
@@ -74,7 +74,7 @@ namespace rnn { inline namespace loss {
         constexpr void operator()(InputIt first1, InputIt last1, InputIt first2, OutputIt d_first) {
             const auto factor = 2.0 / static_cast<value_type>(std::distance(first1, last1));
             for (; first1 != last1; ++first1, ++first2, ++d_first) {
-                d_first = -first2 / first1;
+                d_first = - (*first2 / *first1);
             }
         }
     };

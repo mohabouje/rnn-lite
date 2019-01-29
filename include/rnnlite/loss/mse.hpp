@@ -51,11 +51,11 @@ namespace rnn { inline namespace loss {
          * @return Results of the cost-function
          */
         template <typename InputIt>
-        constexpr value_type operator()(InputIt first1, InputIt last1, InputIt first2) {
+        constexpr value_type operator()(InputIt first1, InputIt last1, InputIt first2) const {
             const auto N      = static_cast<value_type>(std::distance(first1, last1));
             value_type result = 0;
             for (; first1 != last1; ++first1, ++first2) {
-                result += square(first1 - first2);
+                result += square(*first1 - *first2);
             }
             return result / N;
         }
@@ -70,10 +70,10 @@ namespace rnn { inline namespace loss {
          * @param d_first Output iterator storing the derivative of the loss function.
          */
         template <typename InputIt, typename OutputIt>
-        constexpr void operator()(InputIt first1, InputIt last1, InputIt first2, OutputIt d_first) {
+        constexpr void operator()(InputIt first1, InputIt last1, InputIt first2, OutputIt d_first) const {
             const auto factor = 2.0 / static_cast<value_type>(std::distance(first1, last1));
             for (; first1 != last1; ++first1, ++first2, ++d_first) {
-                d_first = factor * first1 - first2;
+                *d_first = factor * (*first1 - *first2);
             }
         }
     };

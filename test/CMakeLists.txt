@@ -10,7 +10,11 @@ set(SOURCE_FILES
         activation/testing_logistic.cpp
         activation/testing_softsign.cpp
         activation/testing_rectifier.cpp
-        activation/testing_tanh.cpp)
+        activation/testing_tanh.cpp
+        #loss/testing_cross_entropy.cpp
+        #loss/testing_cross_entropy_multiclass.cpp
+        loss/testing_mse.cpp
+        loss/testing_absolute.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} rnnlite ${GTEST_LIBRARIES} -pthread)
