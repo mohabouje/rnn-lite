@@ -31,19 +31,24 @@
 * Date: 29/01/19
 */
 
-#ifndef RNNLITE_DERIVATIVE_HPP
-#define RNNLITE_DERIVATIVE_HPP
+#ifndef RNNLITE_MATH_HPP
+#define RNNLITE_MATH_HPP
 
-#include <cstddef>
+#include <algorithm>
 
 namespace rnn {
 
-    template <std::size_t N, class Function, typename T>
-    constexpr auto derivative(Function&& functor, T value) {
-        return functor.template derivative<N>(functor(value));
-    };
+    template <class T>
+    constexpr T square(T t) {
+        return t * t;
+    }
 
+    template <class T>
+    constexpr T sign(T t) {
+        return t < 0 ? -1 : (t > 0 ? 1 : 0);
+
+    }
 
 }
 
-#endif //RNNLITE_DERIVATIVE_HPP
+#endif //RNNLITE_MATH_HPP

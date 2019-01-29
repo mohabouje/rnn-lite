@@ -26,24 +26,58 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: math.hpp
+* Filename: identity.hpp
 * Author: Mohammed Boujemaoui
 * Date: 29/01/19
 */
 
-#ifndef RNNLITE_DERIVATIVE_HPP
-#define RNNLITE_DERIVATIVE_HPP
+#ifndef RNNLITE_IDENTITY_HPP
+#define RNNLITE_IDENTITY_HPP
 
 #include <cstddef>
 
-namespace rnn {
+namespace rnn { inline namespace activation {
 
-    template <std::size_t N, class Function, typename T>
-    constexpr auto derivative(Function&& functor, T value) {
-        return functor.template derivative<N>(functor(value));
-    };
+        /**
+         * A identity function is an activation function that converges polynomially, with equation:
+         *
+         * \f[
+         * {\displaystyle f(x) = x}
+         * \f]
+
+         * @tparam T Numeric type.
+         */
+        template <typename T>
+        struct identity {
+            using value_type = T;
+
+            /**
+             * @brief Evaluates the identity function of the input value.
+             * @param x Input value.
+             * @return Returns the result of applying the identity function to the input value.
+             */
+            constexpr value_type operator()(value_type x) const {
+                return x;
+            }
+
+            /**
+             * @brief Computes the nth-derivative.
+             * @tparam N Order of the derivative.
+             * @param y Input value, obtained from the execution of the identity function y = f(x)
+             * @return Returns the nth-derivative of the identity function.
+             */
+            template <std::size_t N>
+            constexpr value_type derivative(value_type y) const {
+                if constexpr (N == 1) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+        };
 
 
-}
+    }}
 
-#endif //RNNLITE_DERIVATIVE_HPP
+#endif //RNNLITE_IDENTITY_HPP

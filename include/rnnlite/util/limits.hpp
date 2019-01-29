@@ -37,7 +37,7 @@
 #include <limits>
 #include <cmath>
 
-namespace rnn { inline namespace util {
+namespace rnn {
 
     template <typename T>
     struct log_traits {
@@ -53,7 +53,6 @@ namespace rnn { inline namespace util {
 
     };
 
-
-}}
+}
 
 #endif //RNN_LITE_LIMITS_HPP
