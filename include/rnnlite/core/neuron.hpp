@@ -42,15 +42,11 @@ namespace rnn { inline namespace core {
     public:
         using base_class = neuron<ActivationFunction>;
         using value_type = typename ActivationFunction::value_type;
-        using neuron_ptr = std::shared_ptr<base_class >;
-        using map = std::unordered_map<unique_id, neuron_ptr >;
+        using neuron_ptr = std::shared_ptr<base_class>;
+        using map        = std::unordered_map<unique_id, neuron_ptr>;
 
         template <typename... Args>
-        explicit neuron(value_type bias, Args... arg) {
-
-        }
-
-
+        explicit neuron(value_type bias, Args... arg) {}
 
     private:
         unique_id id_;
@@ -62,7 +58,5 @@ namespace rnn { inline namespace core {
         ActivationFunction function_;
     };
 
-
-
-}}
+}}     // namespace rnn::core
 #endif //RNNLITE_NEURON_HPP

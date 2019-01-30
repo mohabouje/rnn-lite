@@ -72,9 +72,9 @@ namespace rnn {
             using value_type = typename Distribution::value_type;
             template <typename... Args>
             explicit RandomGeneratorImpl(Args... arg) :
-                    generator_(
-                            Engine(static_cast<std::size_t>(std::chrono::system_clock::now().time_since_epoch().count()))),
-                    distribution_(Distribution(std::forward(arg...))) {}
+                generator_(
+                    Engine(static_cast<std::size_t>(std::chrono::system_clock::now().time_since_epoch().count()))),
+                distribution_(Distribution(std::forward(arg...))) {}
 
             inline value_type operator()() {
                 return static_cast<value_type>(distribution_(generator_));
@@ -90,15 +90,15 @@ namespace rnn {
 
         template <typename T>
         struct _RandomGenerator<distribution_type::Uniform, T>
-                : public RandomGeneratorImpl<std::uniform_real_distribution<T>> {};
+            : public RandomGeneratorImpl<std::uniform_real_distribution<T>> {};
 
         template <typename T>
         struct _RandomGenerator<distribution_type::Bernoulli, T>
-                : public RandomGeneratorImpl<std::bernoulli_distribution, T> {};
+            : public RandomGeneratorImpl<std::bernoulli_distribution, T> {};
 
         template <typename T>
         struct _RandomGenerator<distribution_type::Binomial, T>
-                : public RandomGeneratorImpl<std::binomial_distribution<T>> {};
+            : public RandomGeneratorImpl<std::binomial_distribution<T>> {};
 
         template <typename T>
         struct _RandomGenerator<distribution_type::Geometric, T>
@@ -113,7 +113,8 @@ namespace rnn {
             : public RandomGeneratorImpl<std::exponential_distribution<T>> {};
 
         template <typename T>
-        struct _RandomGenerator<distribution_type::Gamma, T> : public RandomGeneratorImpl<std::gamma_distribution<T>> {};
+        struct _RandomGenerator<distribution_type::Gamma, T> : public RandomGeneratorImpl<std::gamma_distribution<T>> {
+        };
 
         template <typename T>
         struct _RandomGenerator<distribution_type::Weibull, T>
@@ -124,7 +125,8 @@ namespace rnn {
             : public RandomGeneratorImpl<std::extreme_value_distribution<T>> {};
 
         template <typename T>
-        struct _RandomGenerator<distribution_type::Normal, T> : public RandomGeneratorImpl<std::normal_distribution<T>> {};
+        struct _RandomGenerator<distribution_type::Normal, T>
+            : public RandomGeneratorImpl<std::normal_distribution<T>> {};
 
         template <typename T>
         struct _RandomGenerator<distribution_type::LogNormal, T>
@@ -155,8 +157,8 @@ namespace rnn {
             : public RandomGeneratorImpl<std::piecewise_linear_distribution<T>> {};
 
         template <typename T>
-        struct _RandomGenerator<distribution_type::Cauchy, T> : public RandomGeneratorImpl<std::cauchy_distribution<T>> {
-        };
+        struct _RandomGenerator<distribution_type::Cauchy, T>
+            : public RandomGeneratorImpl<std::cauchy_distribution<T>> {};
 
     } // namespace internal
 
@@ -191,6 +193,6 @@ namespace rnn {
         internal::_RandomGenerator<dist, T> generator_;
     };
 
-}
+} // namespace rnn
 
 #endif //RNNLITE_RANDOM_HPP

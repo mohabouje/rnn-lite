@@ -37,24 +37,22 @@
 #include <rnnlite/optimizer/optimizer_cache.hpp>
 #include <algorithm>
 
-
 namespace rnn { inline namespace optimizer {
-
 
     template <typename Weigth>
     struct adamax_optimizer {
         using value_type = typename Weigth::value_type;
 
-        explicit adamax_optimizer(value_type learning_rate = 0.002) :
-                learning_rate_(learning_rate)
-        {
+        explicit adamax_optimizer(value_type learning_rate = 0.002) : learning_rate_(learning_rate) {}
 
+        void reset() {
+            cache_.reset();
         }
 
         void operator()(Weigth& W, const Weigth& dW) const {
             constexpr auto epsilon = 1e-8;
-            auto &mt = cache_.get<0>(W);
-            auto &ut = cache_.get<1>(W);
+            auto& mt               = cache_.get<0>(W);
+            auto& ut               = cache_.get<1>(W);
 
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 mt[i] = b1_ * mt[i] + (1.0 - b1_) * dW[i];
@@ -75,7 +73,6 @@ namespace rnn { inline namespace optimizer {
         mutable optimizer_cache<2, Weigth, Weigth> cache_;
     };
 
-}}
-
+}} // namespace rnn::optimizer
 
 #endif //RNNLITE_ADAMAX_OPTIMIZER_HPP

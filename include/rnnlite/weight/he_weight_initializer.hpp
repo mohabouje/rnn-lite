@@ -49,9 +49,7 @@ namespace rnn { inline namespace weight {
          * @param fan_in Number of input weight for each neuron
          * @param fan_out Number of output weight for each neuron
          */
-        he_weight_initializer(value_type fan_in, value_type fan_out) :
-            fan_in_(fan_in),
-            generator_(0, 0) {
+        he_weight_initializer(value_type fan_in, value_type fan_out) : fan_in_(fan_in), generator_(0, 0) {
             scale(1);
         }
 
@@ -72,7 +70,7 @@ namespace rnn { inline namespace weight {
          */
         void scale(value_type value) {
             const auto base = std::sqrt(value / fan_in_);
-            generator_ = generator{static_cast<value_type >(0), base};
+            generator_      = generator{static_cast<value_type>(0), base};
         }
 
     private:
@@ -81,7 +79,6 @@ namespace rnn { inline namespace weight {
         generator generator_;
     };
 
-
-}}
+}} // namespace rnn::weight
 
 #endif //RNNLITE_HE_WEIGHT_INITIALIZER_HPP

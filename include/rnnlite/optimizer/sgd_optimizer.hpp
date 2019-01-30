@@ -37,27 +37,24 @@
 #include <algorithm>
 
 namespace rnn { inline namespace optimizer {
-
-
     template <typename Weight>
     struct sgd_optimizer {
         using value_type = typename Weight::value_type;
 
-        explicit sgd_optimizer(value_type learning_rate = 0.01) :
-            learning_rate_(learning_rate) {
-            
-        }
+        explicit sgd_optimizer(value_type learning_rate = 0.01) : learning_rate_(learning_rate) {}
+
+        void reset() {}
 
         void operator()(Weight& W, const Weight& dW) const {
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
-                W[i] -=  learning_rate_ * (dW[i] + weight_decay_ * W[i]);
+                W[i] -= learning_rate_ * (dW[i] + weight_decay_ * W[i]);
             }
         }
 
     private:
         value_type learning_rate_;
         value_type weight_decay_{0};
-
-}}
+    };
+}} // namespace rnn::optimizer
 
 #endif //RNNLITE_MOMENTUM_HPP

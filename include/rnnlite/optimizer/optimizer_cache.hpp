@@ -42,9 +42,8 @@ namespace rnn { inline namespace optimizer {
 
     template <std::size_t N, class Key, class Value>
     struct optimizer_cache {
-
         template <std::size_t M>
-        Value&  get(const Key& key) {
+        Value& get(const Key& key) {
             static_assert(M < N, "Out of bounds");
             auto& map = cache_[M];
 
@@ -58,11 +57,16 @@ namespace rnn { inline namespace optimizer {
             return map[key];
         }
 
+        void reset() {
+            for (auto& element : cache_) {
+                element.clear();
+            }
+        }
 
     private:
         using cache_type = std::unordered_map<Key, Value>;
         std::array<cache_type, N> cache_;
     };
-}}
+}} // namespace rnn::optimizer
 
 #endif //RNNLITE_OPTIMIZER_CACHE_HPP

@@ -38,49 +38,45 @@
 #include <memory>
 #include <unordered_map>
 
-namespace rnn { inline namespace core {{
+namespace rnn {
+    inline namespace core {
+        {
+            template <class Neuron>
+            class edge : public std::enable_shared_from_this<edge<Neuron>> {
+            public:
+                using value_type = typename Neuron::value_type;
+                using edge_ptr   = std::shared_ptr<edge>;
+                using neuron_ptr = std::weak_ptr<Neuron>;
+                using map        = std::unordered_map<unique_id, edge_ptr>;
 
+                explicit edge(const neuron_ptr& input = nullptr, const neuron_ptr& output = nullptr);
 
-    template <class Neuron>
-    class edge : public std::enable_shared_from_this<edge<Neuron>> {
-    public:
-        using value_type = typename Neuron::value_type;
-        using edge_ptr = std::shared_ptr<edge>;
-        using neuron_ptr = std::weak_ptr<Neuron>;
-        using map = std::unordered_map<unique_id, edge_ptr>;
+                const unique_id& id() const {
+                    return id_;
+                }
 
-        explicit edge(const neuron_ptr& input = nullptr, const neuron_ptr& output = nullptr);
+                const neuron_ptr& input() const {
+                    return input_neuron_;
+                }
 
+                const neuron_ptr& output() const {
+                    return output_neuron_;
+                }
 
-        const unique_id& id() const {
-            return id_;
+                void connect(const neuron_ptr& input, const neuron_ptr& outpur) {}
+
+            private:
+                unique_id id_{};
+                value_type weight_{0.0};
+                value_type gain_{1.0};
+                neuron_ptr input_neuron_{nullptr};
+                neuron_ptr output_neuron_{nullptr};
+            };
+
+            template <class Neuron>
+            edge<Neuron>::edge(const edge::neuron_ptr& input, const edge::neuron_ptr& output) :
+                input_neuron_(input),
+                output_neuron_(output) {}
         }
-
-        const neuron_ptr& input() const {
-            return input_neuron_;
-        }
-
-        const neuron_ptr& output() const {
-            return output_neuron_;
-        }
-
-        void connect(const neuron_ptr& input, const neuron_ptr& outpur) {
-
-        }
-
-
-
-    private:
-        unique_id id_{};
-        value_type weight_{0.0};
-        value_type gain_{1.0};
-        neuron_ptr input_neuron_{nullptr};
-        neuron_ptr output_neuron_{nullptr};
-    };
-
-    template<class Neuron>
-    edge<Neuron>::edge(const edge::neuron_ptr &input, const edge::neuron_ptr &output) :
-            input_neuron_(input), output_neuron_(output) {}
-
-    }}
+    }  // namespace core::core
 #endif //RNNLITE_EDGE_HPP

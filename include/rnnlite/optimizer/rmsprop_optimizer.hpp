@@ -34,11 +34,9 @@
 #ifndef RNNLITE_RMSPROP_OPTIMIZER_HPP
 #define RNNLITE_RMSPROP_OPTIMIZER_HPP
 
-
 #include <rnnlite/optimizer/optimizer_cache.hpp>
 #include <algorithm>
 #include <cmath>
-
 
 namespace rnn { inline namespace optimizer {
 
@@ -46,14 +44,16 @@ namespace rnn { inline namespace optimizer {
     struct rmsprop_optimizer {
         using value_type = typename Weigth::value_type;
 
-        explicit rmsprop_optimizer(value_type learning_rate = 0.0001) :
-                learning_rate_(learning_rate)
-        {}
+        explicit rmsprop_optimizer(value_type learning_rate = 0.0001) : learning_rate_(learning_rate) {}
+
+        void reset() {
+            cache_.reset();
+        }
 
         void operator()(Weigth& W, const Weigth& dW) const {
             constexpr auto epsilon = 1e-8;
-            auto &g = cache_.get<0>(W);
-            auto &ut = cache_.get<1>(W);
+            auto& g                = cache_.get<0>(W);
+            auto& ut               = cache_.get<1>(W);
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 g[i] = decay_ * g[i] + (1 - decay_) * dW[i] * dW[i];
                 W[i] -= learning_rate_ * dW[i] / std::sqrt(g[i] + epsilon);
@@ -66,7 +66,6 @@ namespace rnn { inline namespace optimizer {
         mutable optimizer_cache<1, Weigth, Weigth> cache_;
     };
 
-}}
-
+}} // namespace rnn::optimizer
 
 #endif //RNNLITE_RMSPROP_OPTIMIZER_HPP

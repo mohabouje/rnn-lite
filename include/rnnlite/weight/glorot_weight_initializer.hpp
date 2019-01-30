@@ -54,9 +54,9 @@ namespace rnn { inline namespace weight {
          * @param fan_out Number of output weight for each neuron
          */
         glorot_weight_initializer(value_type fan_in, value_type fan_out) :
-                fan_in_(fan_in),
-                fan_out_(fan_out),
-                generator_(0, 0) {
+            fan_in_(fan_in),
+            fan_out_(fan_out),
+            generator_(0, 0) {
             scale(1);
         }
 
@@ -77,7 +77,7 @@ namespace rnn { inline namespace weight {
          */
         void scale(value_type value) {
             const auto base = value / std::sqrt(fan_in_ + fan_out_);
-            generator_ = generator{-base, base};
+            generator_      = generator{-base, base};
         }
 
     private:
@@ -86,8 +86,6 @@ namespace rnn { inline namespace weight {
         generator generator_;
     };
 
-
-}}
-
+}} // namespace rnn::weight
 
 #endif //RNNLITE_GLOROT_WEIGHT_INITIALIZER_HPP

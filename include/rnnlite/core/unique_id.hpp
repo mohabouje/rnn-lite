@@ -39,5 +39,5 @@ namespace rnn { inline namespace core {
 
     using unique_id = std::size_t;
 
-}}
+}}     // namespace rnn::core
 #endif //RNNLITE_UNIQUE_ID_HPP

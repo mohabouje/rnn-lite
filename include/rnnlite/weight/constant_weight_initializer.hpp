@@ -39,10 +39,8 @@
 
 namespace rnn { inline namespace weight {
 
-
     template <typename T>
     struct constant_weight_initializer {
-
         using value_type = T;
 
         /**
@@ -53,7 +51,6 @@ namespace rnn { inline namespace weight {
         constant_weight_initializer(value_type fan_in, value_type fan_out) : {
             scale(1);
         }
-
 
         /**
          * @brief Initialize the given weights with the given constant number and scaling parameter.
@@ -71,14 +68,13 @@ namespace rnn { inline namespace weight {
          * @param value Scale value.
          */
         void scale(value_type value) {
-            scale_  = value;
+            scale_ = value;
         }
 
     private:
         value_type scale_;
     };
 
-
-}}
+}} // namespace rnn::weight
 
 #endif //RNNLITE_CONSTANT_HPP

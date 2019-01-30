@@ -37,16 +37,17 @@
 #include <rnnlite/optimizer/optimizer_cache.hpp>
 #include <algorithm>
 
-
 namespace rnn { inline namespace optimizer {
-
 
     template <typename Weigth>
     struct momentum_optimizer {
         using value_type = typename Weigth::value_type;
 
-        explicit momentum_optimizer(value_type learning_rate = 0.01) :
-                learning_rate_(learning_rate) {}
+        explicit momentum_optimizer(value_type learning_rate = 0.01) : learning_rate_(learning_rate) {}
+
+        void reset() {
+            cache_.reset();
+        }
 
         void operator()(Weigth& W, const Weigth& dW) const {
             auto& dW_previous = cache_.get<0>(W);
@@ -64,7 +65,6 @@ namespace rnn { inline namespace optimizer {
         mutable optimizer_cache<1, Weigth, Weigth> cache_;
     };
 
-}}
-
+}} // namespace rnn::optimizer
 
 #endif //RNNLITE_NESTEROV_OPTIMIZER_HPP

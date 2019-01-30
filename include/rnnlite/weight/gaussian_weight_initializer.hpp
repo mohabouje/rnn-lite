@@ -39,7 +39,7 @@
 #include <algorithm>
 
 namespace rnn { inline namespace weight {
-    
+
     template <typename T>
     struct gaussian_weight_initializer {
         using value_type = T;
@@ -49,8 +49,7 @@ namespace rnn { inline namespace weight {
          * @param fan_in Number of input weight for each neuron
          * @param fan_out Number of output weight for each neuron
          */
-        gaussian_weight_initializer(value_type fan_in, value_type fan_out) :
-            generator_(0, 0) {
+        gaussian_weight_initializer(value_type fan_in, value_type fan_out) : generator_(0, 0) {
             scale(1);
         }
 
@@ -70,7 +69,7 @@ namespace rnn { inline namespace weight {
          * @param value Scale value.
          */
         void scale(value_type value) {
-            generator_ = generator{static_cast<value_type >(0), value};
+            generator_ = generator{static_cast<value_type>(0), value};
         }
 
     private:
@@ -78,8 +77,6 @@ namespace rnn { inline namespace weight {
         generator generator_;
     };
 
-
-}}
-
+}} // namespace rnn::weight
 
 #endif //RNNLITE_GAUSSIAN_WEIGHT_INITIALIZER_HPP
