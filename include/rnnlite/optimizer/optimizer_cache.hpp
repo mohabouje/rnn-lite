@@ -44,17 +44,17 @@ namespace rnn { inline namespace optimizer {
     struct optimizer_cache {
         template <std::size_t M>
         Value& get(const Key& key) {
-            static_assert(M < N, "Out of bounds");
+            //static_assert(M > N, "Out of bounds");
             auto& map = cache_[M];
 
-            auto existing = map.find(key);
+            auto existing = map.find(&key);
             if (existing != map.end()) {
                 existing->second.resize(key.size());
-                return existing;
+                return existing->second;
             }
 
-            map[key] = Key(key.size());
-            return map[key];
+            map[&key] = Key(key.size(), 0);
+            return map[&key];
         }
 
         void reset() {
@@ -64,7 +64,7 @@ namespace rnn { inline namespace optimizer {
         }
 
     private:
-        using cache_type = std::unordered_map<Key, Value>;
+        using cache_type = std::unordered_map<const Key*, Value>;
         std::array<cache_type, N> cache_;
     };
 }} // namespace rnn::optimizer

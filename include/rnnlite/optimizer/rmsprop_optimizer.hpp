@@ -50,10 +50,10 @@ namespace rnn { inline namespace optimizer {
             cache_.reset();
         }
 
-        void operator()(Weigth& W, const Weigth& dW) const {
+        void operator()(Weigth& W, const Weigth& dW) {
             constexpr auto epsilon = 1e-8;
-            auto& g                = cache_.get<0>(W);
-            auto& ut               = cache_.get<1>(W);
+            auto& g                = cache_.template get<0>(W);
+            auto& ut               = cache_.template get<1>(W);
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 g[i] = decay_ * g[i] + (1 - decay_) * dW[i] * dW[i];
                 W[i] -= learning_rate_ * dW[i] / std::sqrt(g[i] + epsilon);
@@ -63,7 +63,7 @@ namespace rnn { inline namespace optimizer {
     private:
         value_type learning_rate_;
         value_type decay_{0.99};
-        mutable optimizer_cache<1, Weigth, Weigth> cache_;
+        optimizer_cache<2, Weigth, Weigth> cache_;
     };
 
 }} // namespace rnn::optimizer

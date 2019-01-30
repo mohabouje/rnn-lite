@@ -49,10 +49,10 @@ namespace rnn { inline namespace optimizer {
             cache_.reset();
         }
 
-        void operator()(Weigth& W, const Weigth& dW) const {
+        void operator()(Weigth& W, const Weigth& dW) {
             constexpr auto epsilon = 1e-8;
-            auto& mt               = cache_.get<0>(W);
-            auto& ut               = cache_.get<1>(W);
+            auto& mt               = cache_.template get<0>(W);
+            auto& ut               = cache_.template get<1>(W);
 
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 mt[i] = b1_ * mt[i] + (1.0 - b1_) * dW[i];
@@ -70,7 +70,7 @@ namespace rnn { inline namespace optimizer {
         value_type b1_{0.9};
         value_type b2_{0.999};
         value_type b1_t_{0.9};
-        mutable optimizer_cache<2, Weigth, Weigth> cache_;
+        optimizer_cache<2, Weigth, Weigth> cache_;
     };
 
 }} // namespace rnn::optimizer

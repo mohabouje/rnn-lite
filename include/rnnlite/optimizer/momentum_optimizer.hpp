@@ -49,8 +49,8 @@ namespace rnn { inline namespace optimizer {
             cache_.reset();
         }
 
-        void operator()(Weigth& W, const Weigth& dW) const {
-            auto& dW_previous = cache_.get<0>(W);
+        void operator()(Weigth& W, const Weigth& dW) {
+            auto& dW_previous = cache_.template get<0>(W);
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 const auto V = momentum_ * dW_previous[i] - learning_rate_ * (dW[i] + weight_decay_ * W[i]);
                 W[i] += V;
@@ -62,7 +62,7 @@ namespace rnn { inline namespace optimizer {
         value_type learning_rate_;
         value_type weight_decay_{0};
         value_type momentum_{0.9};
-        mutable optimizer_cache<1, Weigth, Weigth> cache_;
+        optimizer_cache<1, Weigth, Weigth> cache_;
     };
 
 }} // namespace rnn::optimizer

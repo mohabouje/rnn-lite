@@ -11,6 +11,7 @@ set(SOURCE_FILES
         activation/testing_softsign.cpp
         activation/testing_rectifier.cpp
         activation/testing_tanh.cpp
+        optimizer/testing_optimizer.cpp
         #loss/testing_cross_entropy.cpp
         #loss/testing_cross_entropy_multiclass.cpp
         loss/testing_mse.cpp

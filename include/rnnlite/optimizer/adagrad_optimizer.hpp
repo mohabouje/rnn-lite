@@ -41,18 +41,18 @@
 namespace rnn { inline namespace optimizer {
 
     template <typename Weigth>
-    struct adamax_optimizer {
+    struct adagrad_optimizer {
         using value_type = typename Weigth::value_type;
 
-        explicit adamax_optimizer(value_type learning_rate = 0.002) : learning_rate_(learning_rate) {}
+        explicit adagrad_optimizer(value_type learning_rate = 0.01) : learning_rate_(learning_rate) {}
 
         void reset() {
             cache_.reset();
         }
 
-        void operator()(Weigth& W, const Weigth& dW) const {
-            constexpr auto epsilon = 1e-8;
-            auto& g                = cache_.get<0>(W);
+        void operator()(Weigth& W, const Weigth& dW) {
+            constexpr value_type epsilon = 1e-8;
+            auto& g                = cache_.template get<0>(W);
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 g[i] += dW[i] * dW[i];
                 W[i] -= learning_rate_ * dW[i] / (std::sqrt(g[i]) + epsilon);
@@ -61,7 +61,7 @@ namespace rnn { inline namespace optimizer {
 
     private:
         value_type learning_rate_;
-        mutable optimizer_cache<2, Weigth, Weigth> cache_;
+        optimizer_cache<2, Weigth, Weigth> cache_;
     };
 
 }} // namespace rnn::optimizer

@@ -45,7 +45,7 @@ namespace rnn { inline namespace optimizer {
 
         void reset() {}
 
-        void operator()(Weight& W, const Weight& dW) const {
+        void operator()(Weight& W, const Weight& dW) {
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 W[i] -= learning_rate_ * (dW[i] + weight_decay_ * W[i]);
             }
