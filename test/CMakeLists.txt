@@ -11,14 +11,17 @@ set(SOURCE_FILES
         activation/testing_softsign.cpp
         activation/testing_rectifier.cpp
         activation/testing_tanh.cpp
+        core/testing_tensor.cpp
+        core/testing_tensor_map.cpp
         optimizer/testing_optimizer.cpp
         #loss/testing_cross_entropy.cpp
         #loss/testing_cross_entropy_multiclass.cpp
         loss/testing_mse.cpp
         loss/testing_absolute.cpp)
 
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} rnnlite ${GTEST_LIBRARIES} -pthread)
+target_link_libraries(${PROJECT_NAME} rnnlite ${GTEST_LIBRARIES} -pthread Eigen3::Eigen)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PRIVATE CURRENT_TEST_PATH="${CMAKE_CURRENT_SOURCE_DIR}")

@@ -26,31 +26,44 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: tensor.hpp
+* Filename: tensor_map.hpp
 * Author: Mohammed Boujemaoui
 * Date: 29/01/19
 */
-#ifndef RNNLITE_TENSOR_HPP
-#define RNNLITE_TENSOR_HPP
+#ifndef RNNLITE_TENSOR_MAP_HPP
+#define RNNLITE_TENSOR_MAP_HPP
 
-#include <eigen3/unsupported/Eigen/CXX11/Tensor>
+#include <rnnlite/core/tensor.hpp>
+#include <rnnlite/core/vector.hpp>
+#include <rnnlite/core/matrix.hpp>
+
+#include <iterator>
+#include <vector>
 
 namespace rnn { inline namespace types {
 
+    /**
+     * This class create a tensor on top of memory allocated and owned by
+     * another part of the code. It allows to view any piece of allocated
+     * memory as a Tensor.
+     *
+     * @tparam T Type of the elements
+     * @tparam N Number of dimensions.
+     */
     template <typename T, std::size_t N>
-    class tensor : public Eigen::Tensor<T, N> {};
+    using tensor_map = Eigen::TensorMap<Eigen::Tensor<T, N>>;
 
     template <typename T>
-    using tensor1_t = tensor<T, 1>;
+    using tensor_map1_t = tensor_map<T, 1>;
 
     template <typename T>
-    using tensor2_t = tensor<T, 2>;
+    using tensor_map2_t = tensor_map<T, 2>;
 
     template <typename T>
-    using tensor3_t = tensor<T, 3>;
+    using tensor_map3_t = tensor_map<T, 3>;
 
     template <typename T>
-    using tensor4_t = tensor<T, 4>;
+    using tensor_map4_t = tensor_map<T, 4>;
 }} // namespace rnn::types
 
-#endif //RNNLITE_TENSOR_HPP
+#endif //RNNLITE_TENSOR_MAP_HPP

@@ -26,31 +26,15 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: tensor_map.hpp
+* Filename: testing_tensor_map.cpp
 * Author: Mohammed Boujemaoui
-* Date: 29/01/19
+* Date: 30/01/19
 */
-#ifndef RNNLITE_TENSOR_MAP_HPP
-#define RNNLITE_TENSOR_MAP_HPP
 
-#include <rnnlite/core/tensor.hpp>
+#include <rnnlite/core/tensor_map.hpp>
+#include <gtest/gtest.h>
 
-namespace rnn { inline namespace types {
-
-    template <typename T, std::size_t N>
-    class tensor_map : public Eigen::TensorMap<tensor<T, N>> {};
-
-    template <typename T>
-    using tensor_map1_t = tensor_map<T, 1>;
-
-    template <typename T>
-    using tensor_map2_t = tensor_map<T, 2>;
-
-    template <typename T>
-    using tensor_map3_t = tensor_map<T, 3>;
-
-    template <typename T>
-    using tensor_map4_t = tensor_map<T, 4>;
-}} // namespace rnn::types
-
-#endif //RNNLITE_TENSOR_MAP_HPP
+TEST(TensorMap, TestingEmpty) {
+    rnn::tensor1_t<float> external_data{};
+    rnn::tensor_map1_t<float> example(external_data);
+}

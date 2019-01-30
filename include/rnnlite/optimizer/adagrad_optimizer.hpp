@@ -52,7 +52,7 @@ namespace rnn { inline namespace optimizer {
 
         void operator()(Weigth& W, const Weigth& dW) {
             constexpr value_type epsilon = 1e-8;
-            auto& g                = cache_.template get<0>(W);
+            auto& g                      = cache_.template get<0>(W);
             for (auto i = 0ul, size = W.size(); i < size; ++i) {
                 g[i] += dW[i] * dW[i];
                 W[i] -= learning_rate_ * dW[i] / (std::sqrt(g[i]) + epsilon);

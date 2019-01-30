@@ -26,31 +26,31 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: tensor_ref.hpp
+* Filename: tensor.hpp
 * Author: Mohammed Boujemaoui
 * Date: 29/01/19
 */
-#ifndef RNNLITE_TENSOR_REF_HPP
-#define RNNLITE_TENSOR_REF_HPP
+#ifndef RNNLITE_TENSOR_HPP
+#define RNNLITE_TENSOR_HPP
 
-#include <rnnlite/core/tensor.hpp>
+#include <eigen3/unsupported/Eigen/CXX11/Tensor>
 
 namespace rnn { inline namespace types {
 
     template <typename T, std::size_t N>
-    class tensor_ref : public Eigen::TensorRef<tensor<T, N>> {};
+    using tensor = Eigen::Tensor<T, N>;
 
     template <typename T>
-    using tensor_ref1_t = tensor_ref<T, 1>;
+    using tensor1_t = tensor<T, 1>;
 
     template <typename T>
-    using tensor_ref2_t = tensor_ref<T, 2>;
+    using tensor2_t = tensor<T, 2>;
 
     template <typename T>
-    using tensor_ref3_t = tensor_ref<T, 3>;
+    using tensor3_t = tensor<T, 3>;
 
     template <typename T>
-    using tensor_ref4_t = tensor_ref<T, 4>;
+    using tensor4_t = tensor<T, 4>;
 }} // namespace rnn::types
 
-#endif //RNNLITE_TENSOR_REF_HPP
+#endif //RNNLITE_TENSOR_HPP

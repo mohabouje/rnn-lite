@@ -42,6 +42,7 @@ namespace rnn { inline namespace types {
 
     template <typename T>
     using matrix_map = Eigen::Map<matrix<T>>;
+
 }} // namespace rnn::types
 
 #endif //RNNLITE_MATRIX_HPP
