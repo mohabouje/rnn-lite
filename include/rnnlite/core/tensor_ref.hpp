@@ -26,7 +26,7 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: tensor_map.hpp
+* Filename: tensor_ref.hpp
 * Author: Mohammed Boujemaoui
 * Date: 29/01/19
 */
@@ -51,19 +51,19 @@ namespace rnn { inline namespace types {
      * @tparam N Number of dimensions.
      */
     template <typename T, std::size_t N>
-    using tensor_map = Eigen::TensorMap<Eigen::Tensor<T, N>>;
+    using tensor_ref = Eigen::TensorMap<Eigen::Tensor<T, N>>;
 
     template <typename T>
-    using tensor_map1_t = tensor_map<T, 1>;
+    using tensor_ref1_t = tensor_ref<T, 1>;
 
     template <typename T>
-    using tensor_map2_t = tensor_map<T, 2>;
+    using tensor_ref2_t = tensor_ref<T, 2>;
 
     template <typename T>
-    using tensor_map3_t = tensor_map<T, 3>;
+    using tensor_ref3_t = tensor_ref<T, 3>;
 
     template <typename T>
-    using tensor_map4_t = tensor_map<T, 4>;
+    using tensor_ref4_t = tensor_ref<T, 4>;
 }} // namespace rnn::types
 
 #endif //RNNLITE_TENSOR_MAP_HPP

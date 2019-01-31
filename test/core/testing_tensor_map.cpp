@@ -31,10 +31,10 @@
 * Date: 30/01/19
 */
 
-#include <rnnlite/core/tensor_map.hpp>
+#include <rnnlite/core/tensor_ref.hpp>
 #include <gtest/gtest.h>
 
 TEST(TensorMap, TestingEmpty) {
     rnn::tensor1_t<float> external_data{};
-    rnn::tensor_map1_t<float> example(external_data);
+    rnn::tensor_ref1_t<float> example(external_data);
 }

@@ -41,7 +41,8 @@ namespace rnn { inline namespace types {
     class vector : public Eigen::Matrix<T, Eigen::Dynamic, 1> {};
 
     template <typename T>
-    using vector_map = Eigen::Map<vector<T>>;
+    using vector_ref = Eigen::Map<vector<T>>;
+
 }} // namespace rnn::types
 
 #endif //RNNLITE_VECTOR_HPP

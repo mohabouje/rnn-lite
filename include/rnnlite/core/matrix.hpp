@@ -41,7 +41,7 @@ namespace rnn { inline namespace types {
     class matrix : public Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> {};
 
     template <typename T>
-    using matrix_map = Eigen::Map<matrix<T>>;
+    using matrix_ref = Eigen::Map<matrix<T>>;
 
 }} // namespace rnn::types
 
