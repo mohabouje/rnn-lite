@@ -39,6 +39,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include "vector.hpp"
 
 namespace rnn { inline namespace core {
 
@@ -46,7 +47,7 @@ namespace rnn { inline namespace core {
     class edge_interface;
 
     template <typename T>
-    class node : std::enable_shared_from_this<node> {
+    class node : std::enable_shared_from_this<node<T>> {
     public:
         using edge_ptr = std::shared_ptr<edge_interface<T>>;
 
@@ -55,11 +56,7 @@ namespace rnn { inline namespace core {
          * @param fan_in Number of input channels.
          * @param fan_out Number of output channels.
          */
-        node(std::size_t fan_in, std::size_t fan_out) :
-            input_edges_(fan_in),
-            output_edges_(fan_out) {
-
-        }
+        node(std::size_t fan_in, std::size_t fan_out) : input_edges_(fan_in), output_edges_(fan_out) {}
 
         /**
          * @brief Returns the number of input channels
@@ -98,7 +95,7 @@ namespace rnn { inline namespace core {
          * @param index Index of the edge.
          * @return Array representing the shape of the edge.
          */
-        const std::vector<std::size_t>& input_shape(std::size_t index) const {
+        const rnn::array_view<std::size_t>& input_shape(std::size_t index) const {
             return input_edges_[index]->shape();
         }
 
@@ -107,7 +104,7 @@ namespace rnn { inline namespace core {
          * @param index Index of the edge.
          * @return Array representing the shape of the edge.
          */
-        const std::vector<std::size_t>& output_shape(std::size_t index) const {
+        rnn::array_view<long int> output_shape(std::size_t index) const {
             return output_edges_[index]->shape();
         }
 
@@ -132,8 +129,6 @@ namespace rnn { inline namespace core {
         std::vector<edge_ptr> output_edges_;
     };
 
-
-
     template <typename T>
     class edge_interface {
     public:
@@ -143,14 +138,13 @@ namespace rnn { inline namespace core {
          * @brief Creates an edge with the given configuration
          * @param parent Parent node of the edge.
          */
-        explicit edge_interface(node_ptr parent) :
-                parent_(std::move(parent)) {}
+        explicit edge_interface(node_ptr parent) : parent_(std::move(parent)) {}
 
         /**
-         * @brief Append a node to the list of childrens.
-         * @param other Node to be inserted.
+         * @brief Connect a node to this edge.
+         * @param other Node to be connected.
          */
-        void append(const node_ptr& other) {
+        virtual void connect(const node_ptr& other) {
             childs_.push_back(other);
         }
 
@@ -187,7 +181,7 @@ namespace rnn { inline namespace core {
         /**
          * @return Returns an array representing the shape of the tensor.
          */
-        virtual const std::vector<std::size_t>& shape() const = 0;
+        virtual rnn::array_view<long int> shape() const = 0;
 
         /**
          * @brief Resets the edge to the original state.
@@ -199,60 +193,54 @@ namespace rnn { inline namespace core {
         std::vector<node_ptr> childs_;
     };
 
-
     template <typename T, std::size_t Rank>
     class edge : public edge_interface<T> {
     public:
+        using node_ptr = typename edge_interface<T>::node_ptr;
+
         template <typename... Args>
         explicit edge(const node_ptr& parent, Args... arg) :
-                edge_interface(parent),
-                data_(std::forward<Args>(arg)...),
-                gradient_(std::forward<Args>(arg)...),
-                shape_(Rank)
-        {
-            for (auto i = 0ul; i < Rank; ++i) {
-                shape_[i] = static_cast<std::size_t>(data_.dimension(i));
-            }
-        }
+            edge_interface<T>(parent),
+            data_(std::forward<Args>(arg)...),
+            gradient_(std::forward<Args>(arg)...) {}
 
         void reset() override {
             std::fill(data_.data(), data_.data() + data_.size(), static_cast<T>(0));
         }
 
-        auto data() const override {
+        const T* data() const override {
             return data_.data();
         }
 
-        auto data() override {
+        T* data() override {
             return data_.data();
         }
 
-        auto gradients() override {
+        T* gradients() override {
             return gradient_.data();
         }
 
-        auto gradients() const override {
+        const T* gradients() const override {
             return gradient_.data();
         }
 
-        auto size() const override {
+        std::size_t size() const override {
             return static_cast<std::size_t>(gradient_.size());
         }
 
-        auto rank() const override {
+        std::size_t rank() const override {
             return Rank;
         }
 
-        const std::vector<std::size_t>& shape() const override {
-            return shape_;
+        rnn::array_view<long int> shape() const override {
+            return data_.dimensions();
         }
 
     private:
         tensor<T, Rank> data_;
         tensor<T, Rank> gradient_;
-        std::vector<std::size_t> shape_{};
     };
 
-}}
+}} // namespace rnn::core
 
 #endif //RNNLITE_NODE_HPP

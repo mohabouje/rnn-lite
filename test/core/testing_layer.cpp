@@ -26,27 +26,12 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: vector.hpp
+* Filename: testing_edge.cpp
 * Author: Mohammed Boujemaoui
-* Date: 29/01/19
+* Date: 30/01/19
 */
-#ifndef RNNLITE_VECTOR_HPP
-#define RNNLITE_VECTOR_HPP
 
-#include <eigen3/Eigen/Dense>
-#include <rnnlite/third_party/array_view.hpp>
+#include <rnnlite/core/layer.hpp>
+#include <gtest/gtest.h>
 
-namespace rnn { inline namespace types {
-
-    template <typename T>
-    using array_view = arv::array_view<T>;
-
-    template <typename T>
-    class vector : public Eigen::Matrix<T, Eigen::Dynamic, 1> {};
-
-    template <typename T>
-    using vector_ref = Eigen::Map<vector<T>>;
-
-}} // namespace rnn::types
-
-#endif //RNNLITE_VECTOR_HPP
+TEST(Layer, DefaultLayer) {}

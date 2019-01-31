@@ -26,27 +26,50 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: vector.hpp
+* Filename: testing_edge.cpp
 * Author: Mohammed Boujemaoui
-* Date: 29/01/19
+* Date: 30/01/19
 */
-#ifndef RNNLITE_VECTOR_HPP
-#define RNNLITE_VECTOR_HPP
 
-#include <eigen3/Eigen/Dense>
-#include <rnnlite/third_party/array_view.hpp>
+#include <rnnlite/core/node.hpp>
+#include <rnnlite/core/tensor_ref.hpp>
+#include <gtest/gtest.h>
 
-namespace rnn { inline namespace types {
+TEST(Edge, InitializeWithGivenShape) {
+    constexpr auto Rank = 3;
+    constexpr auto X    = 42;
+    constexpr auto Y    = 60;
+    constexpr auto Z    = 42;
+    rnn::edge<float, Rank> edge(nullptr, X, Y, Z);
+    EXPECT_EQ(Rank, edge.rank());
 
-    template <typename T>
-    using array_view = arv::array_view<T>;
+    const auto& shape = edge.shape();
+    EXPECT_EQ(shape.size(), Rank);
+    EXPECT_EQ(X, shape[0]);
+    EXPECT_EQ(Y, shape[1]);
+    EXPECT_EQ(Z, shape[2]);
 
-    template <typename T>
-    class vector : public Eigen::Matrix<T, Eigen::Dynamic, 1> {};
+    const auto size = X * Y * Z;
+    EXPECT_EQ(size, edge.size());
+}
 
-    template <typename T>
-    using vector_ref = Eigen::Map<vector<T>>;
+TEST(Edge, AccessingInternalData) {
+    constexpr auto Rank = 3;
+    constexpr auto X    = 42;
+    constexpr auto Y    = 60;
+    constexpr auto Z    = 42;
+    rnn::edge<float, Rank> edge(nullptr, X, Y, Z);
 
-}} // namespace rnn::types
+    const auto data = edge.data();
+    rnn::tensor_ref<float, Rank> reference(data, X, Y, Z);
 
-#endif //RNNLITE_VECTOR_HPP
+    for (auto i = 0ul; i < X; ++i) {
+        for (auto j = 0ul; j < Y; ++j) {
+            for (auto k = 0ul; k < Z; ++k) {
+                reference(i, j, k) = 4;
+            }
+        }
+    }
+
+    EXPECT_EQ(std::count(data, data + edge.size(), 4), edge.size());
+}

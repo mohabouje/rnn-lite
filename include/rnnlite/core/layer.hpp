@@ -38,31 +38,62 @@
 #include <rnnlite/core/tensor_ref.hpp>
 #include <rnnlite/core/matrix.hpp>
 
-
 namespace rnn { inline namespace core {
 
-
-    class layer_interface : public node {
+    template <typename T>
+    class layer_interface : public node<T> {
     public:
-        layer_interface(std::size_t fan_in, std::size_t fan_out) :
-                node(fan_in, fan_out) {}
+        using edge_ptr = typename node<T>::edge_ptr;
+        layer_interface(std::size_t fan_in, std::size_t fan_out) : node<T>(fan_in, fan_out) {}
 
-        virtual bool trainable() const = 0;
+        /**
+         * @brief Returns the input-edge at the given index.
+         * @param index Index of the input edge.
+         * @return Smart pointer holding an input edge.
+         */
+        virtual edge_ptr& input(std::size_t index) = 0;
+
+        /**
+         * @brief Returns the output-edge at the given index.
+         * @param index Index of the output edge.
+         * @return Smart pointer holding an output edge.
+         */
+        virtual edge_ptr& output(std::size_t index) = 0;
+
+        /**
+         * @brief Returns the input-edge at the given index.
+         * @param index Index of the input edge.
+         * @return Smart pointer holding an input edge.
+         */
+        virtual const edge_ptr& input(std::size_t index) const = 0;
+
+        /**
+         * @brief Returns the output-edge at the given index.
+         * @param index Index of the output edge.
+         * @return Smart pointer holding an output edge.
+         */
+        virtual const edge_ptr& output(std::size_t index) const = 0;
+
+        virtual void set_input_data(const std::vector<rnn::array_view<T>>& data)      = 0;
+        virtual void set_output_gradient(const std::vector<rnn::array_view<T>>& data) = 0;
+        virtual std::vector<rnn::array_view<T>> output() const                        = 0;
+
+        virtual bool trainable() const          = 0;
         virtual const std::string& type() const = 0;
 
-        virtual void setup() = 0;
-        virtual void optimize() = 0;
-        virtual void reset() = 0;
-        virtual void initialize_weights() = 0;
+        virtual void setup(bool initialize_weights) = 0;
+        virtual void optimize()                     = 0;
+        virtual void reset()                        = 0;
+        virtual void initialize_weights()           = 0;
+
+        virtual void backward() = 0;
+        virtual void forward()  = 0;
     };
 
-    template <typename T,
-            std::size_t Rank,
-            class MetaInformation,
-            class WeightInitializer,
-            class Optimizer>
-    class layer : public layer_interface {
+    template <typename T, std::size_t Rank, class MetaInformation, class WeightInitializer, class Optimizer>
+    class layer : public layer_interface<T> {
     public:
+        using edge_ptr = typename layer_interface<T>::edge_ptr;
 
         /**
          * @brief Creates a layer with N-input and M-output
@@ -71,7 +102,7 @@ namespace rnn { inline namespace core {
          */
         layer(const std::vector<MetaInformation>& input_information,
               const std::vector<MetaInformation>& output_information) :
-            layer_interface(input_information.size(), output_information.size()),
+            layer_interface<T>(input_information.size(), output_information.size()),
             weight_initializer_(input_information.size(), output_information.size()),
             bias_initializer_(input_information.size(), output_information.size()),
             inputs_information_(input_information),
@@ -84,11 +115,11 @@ namespace rnn { inline namespace core {
          * @param index Index of the input edge.
          * @return Smart pointer holding an input edge.
          */
-        auto& input(std::size_t index) {
-            if (!input_edges_[index]) {
+        edge_ptr& input(std::size_t index) override {
+            if (!this->input_edges_[index]) {
                 allocate_input(index);
             }
-            return input_edges_[index];
+            return this->input_edges_[index];
         }
 
         /**
@@ -96,10 +127,11 @@ namespace rnn { inline namespace core {
          * @param index Index of the output edge.
          * @return Smart pointer holding an output edge.
          */
-        auto& output(std::size_t index) {
-            if (!output_edges_[index]) {
+        edge_ptr& output(std::size_t index) override {
+            if (!this->output_edges_[index]) {
+                allocate_output(index);
             }
-            return output_edges_[index];
+            return this->output_edges_[index];
         }
 
         /**
@@ -107,8 +139,8 @@ namespace rnn { inline namespace core {
          * @param index Index of the input edge.
          * @return Smart pointer holding an input edge.
          */
-        const auto& input(std::size_t index) const {
-            return input_edges_[index];
+        const edge_ptr& input(std::size_t index) const override {
+            return this->input_edges_[index];
         }
 
         /**
@@ -116,10 +148,9 @@ namespace rnn { inline namespace core {
          * @param index Index of the output edge.
          * @return Smart pointer holding an output edge.
          */
-        const auto& output(std::size_t index) const {
-            return output_edges_[index];
+        const edge_ptr& output(std::size_t index) const override {
+            return this->output_edges_[index];
         }
-
 
         /**
          * @brief Updates the optimizer
@@ -130,19 +161,35 @@ namespace rnn { inline namespace core {
         }
 
         /**
+         * @brief Updates the weight initializer
+         * @param optimizer Initializer to be used.
+         */
+        void set_weight_initializer(WeightInitializer initializer) {
+            weight_initializer_ = std::move(initializer);
+        }
+
+        /**
+         * @brief Updates the bias initializer
+         * @param optimizer Initializer to be used.
+         */
+        void set_bias_initializer(WeightInitializer initializer) {
+            bias_initializer_ = std::move(initializer);
+        }
+
+        /**
          * @brief Creates an edge with the input shape at the given channel
          * @param index Index of the input channel
          */
         void allocate_input(std::size_t index) {
             const auto& shape = inputs_information_[index].shape();
             if constexpr (Rank == 1) {
-                input_edges_[index] = std::make_shared<edge<T, Rank>>(nullptr, shape[0]);
+                this->input_edges_[index].reset(new edge<T, Rank>>(nullptr, shape[0]));
             } else if constexpr (Rank == 2) {
-                input_edges_[index] = std::make_shared<edge<T, Rank>>(nullptr, shape[0], shape[1]);
+                this->input_edges_[index].reset(new edge<T, Rank>>(nullptr, shape[0], shape[1]));
             } else if constexpr (Rank == 3) {
-                input_edges_[index] = std::make_shared<edge<T, Rank>>(nullptr, shape[0], shape[1], shape[2]);
+                this->input_edges_[index].reset(new edge<T, Rank>>(nullptr, shape[0], shape[1], shape[2]));
             } else if constexpr (Rank == 4) {
-                input_edges_[index] = std::make_shared<edge<T, Rank>>(nullptr, shape[0], shape[1], shape[2], shape[3]);
+                this->input_edges_[index].reset(new edge<T, Rank>>(nullptr, shape[0], shape[1], shape[2], shape[3]));
             }
         }
 
@@ -153,28 +200,100 @@ namespace rnn { inline namespace core {
         void allocate_output(std::size_t index) {
             const auto& shape = outputs_information_[index].shape();
             if constexpr (Rank == 1) {
-                output_edges_[index] = std::make_shared<edge<T, Rank>>(dynamic_cast<node*>(this), shape[0]);
+                this->output_edges_[index].reset(new edge<T, Rank>>(this, shape[0]));
             } else if constexpr (Rank == 2) {
-                output_edges_[index] = std::make_shared<edge<T, Rank>>(dynamic_cast<node*>(this), shape[0], shape[1]);
+                this->output_edges_[index].reset(new edge<T, Rank>>(this, shape[0], shape[1]));
             } else if constexpr (Rank == 3) {
-                output_edges_[index] = std::make_shared<edge<T, Rank>>(dynamic_cast<node*>(this), shape[0], shape[1], shape[2]);
+                this->output_edges_[index].reset(new edge<T, Rank>>(this, shape[0], shape[1], shape[2]));
             } else if constexpr (Rank == 4) {
-                output_edges_[index] = std::make_shared<edge<T, Rank>>(dynamic_cast<node*>(this), shape[0], shape[1], shape[2], shape[3]);
+                this->output_edges_[index].reset(new edge<T, Rank>>(this, shape[0], shape[1], shape[2], shape[3]));
             }
+        }
+
+        void set_input_data(const std::vector<rnn::array_view<T>>& data) override {
+            for (auto i = 0ul, j = 0ul; i < this->fan_in(); ++i) {
+                if (inputs_information_[i].type()) {
+                    auto& reference = data[j++];
+                    std::copy(std::cbegin(reference), std::cend(reference), input(i)->data());
+                }
+            }
+        }
+
+        void set_output_gradient(const std::vector<rnn::array_view<T>>& data) override {
+            for (auto i = 0ul, j = 0ul; i < this->fan_out(); ++i) {
+                if (outputs_information_[i].type()) {
+                    auto& reference = data[j++];
+                    std::copy(std::cbegin(reference), std::cend(reference), output(i)->gradients());
+                }
+            }
+        }
+
+        std::vector<rnn::array_view<T>> output() const override {
+            std::vector<rnn::array_view<T>> temporal;
+            temporal.reserve(this->fan_out());
+
+            for (auto i = 0ul; i < this->fan_out(); ++i) {
+                if (outputs_information_[i].type()) {
+                    const auto& reference = input(i);
+                    temporal.emplace_back(reference->data(), reference->size());
+                }
+            }
+
+            return temporal;
+        }
+
+        void forward() override {
+            std::vector<rnn::array_view<T>> input_data, output_data;
+
+            input_data.reserve(this->fan_in());
+            for (auto& element : this->inputs()) {
+                input_data.emplace_back(element->data(), element->size());
+                element->reset();
+            }
+
+            // TODO: ensure the right size, if need resize everything.
+
+            output_data.reserve(this->fan_out());
+            for (auto& element : this->outputs()) {
+                output_data.emplace_back(element->data(), element->size());
+                element->reset();
+            }
+
+            // TODO: call the forward propagation
+        }
+
+        void backward() override {
+            std::vector<rnn::array_view<T>> input_data, input_gradient, output_data, output_gradient;
+
+            input_data.reserve(this->fan_in());
+            input_gradient.reserve(this->fan_in());
+            for (auto& element : this->inputs()) {
+                input_data.emplace_back(element->data(), element->size());
+                input_gradient.emplace_back(element->gradients(), element->size());
+            }
+
+            output_data.reserve(this->fan_out());
+            output_gradient.reserve(this->fan_out());
+            for (auto& element : this->outputs()) {
+                output_data.emplace_back(element->data(), element->size());
+                output_gradient.emplace_back(element->gradients(), element->size());
+            }
+
+            // TODO: call the backward propagation
         }
 
         /**
          * @brief Reset the information of the different input channels.
          */
         void reset() override {
-            for (auto i = 0ul, size = fan_in(); i < size; ++i) {
+            for (auto i = 0ul, size = this->fan_in(); i < size; ++i) {
                 input(i)->reset();
             }
         }
 
         void initialize_weights() override {
-            if (trainable()) {
-                for (auto i = 0ul, size = fan_in(); i < size; ++i) {
+            if (this->trainable()) {
+                for (auto i = 0ul, size = this->fan_in(); i < size; ++i) {
                     auto weights = input(i)->data();
                     weight_initializer_(weights, weights + input(i)->size());
                 }
@@ -182,8 +301,16 @@ namespace rnn { inline namespace core {
             initialized_ = true;
         }
 
-        void setup() override {
-            // TODO: implement this part
+        void setup(bool init_weights) override {
+            for (auto i = 0ul; i < this->fan_out(); ++i) {
+                if (!this->output_edges_[i]) {
+                    allocate_output(i);
+                }
+            }
+
+            if (!initialized_ || init_weights) {
+                initialize_weights();
+            }
         }
 
         void optimize() override {
@@ -197,9 +324,28 @@ namespace rnn { inline namespace core {
         WeightInitializer bias_initializer_{};
         std::vector<MetaInformation> inputs_information_;
         std::vector<MetaInformation> outputs_information_;
-        unique_id weights_{0}; // TODO: try to put here the right thing!
     };
 
-}}
+    template <typename T>
+    inline void connect(const std::shared_ptr<layer_interface<T>>& head,
+                        const std::shared_ptr<layer_interface<T>>& tail, std::size_t head_index,
+                        std::size_t tail_index) {
+        auto& head_shape = head->shape(head_index);
+        auto& tail_shape = tail->shape(tail_index);
+
+        if (head_shape.size() != tail_shape.size()) {
+            throw std::runtime_error("Whatever");
+        }
+
+        auto head_edge = head->output(head_index);
+        if (!head_edge) {
+            throw std::runtime_error("Another error");
+        }
+
+        head_edge->connect(tail);
+        tail->input(tail_index) = head_edge;
+    }
+
+}} // namespace rnn::core
 
 #endif //RNNLITE_LAYER_HPP

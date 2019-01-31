@@ -13,6 +13,9 @@ set(SOURCE_FILES
         activation/testing_tanh.cpp
         core/testing_tensor.cpp
         core/testing_tensor_map.cpp
+        core/testing_edge.cpp
+        core/testing_node.cpp
+        core/testing_layer.cpp
         optimizer/testing_optimizer.cpp
         #loss/testing_cross_entropy.cpp
         #loss/testing_cross_entropy_multiclass.cpp

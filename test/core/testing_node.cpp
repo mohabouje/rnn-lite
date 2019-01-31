@@ -26,27 +26,27 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: vector.hpp
+* Filename: testing_edge.cpp
 * Author: Mohammed Boujemaoui
-* Date: 29/01/19
+* Date: 30/01/19
 */
-#ifndef RNNLITE_VECTOR_HPP
-#define RNNLITE_VECTOR_HPP
 
-#include <eigen3/Eigen/Dense>
-#include <rnnlite/third_party/array_view.hpp>
+#include <rnnlite/core/node.hpp>
+#include <gtest/gtest.h>
 
-namespace rnn { inline namespace types {
+TEST(Node, InitializeSimpleNode) {
+    const auto In  = 3;
+    const auto Out = 4;
+    rnn::node<float> node(In, Out);
 
-    template <typename T>
-    using array_view = arv::array_view<T>;
+    EXPECT_EQ(node.fan_in(), In);
+    EXPECT_EQ(node.fan_out(), Out);
 
-    template <typename T>
-    class vector : public Eigen::Matrix<T, Eigen::Dynamic, 1> {};
+    for (auto& input_edge : node.inputs()) {
+        EXPECT_FALSE(input_edge);
+    }
 
-    template <typename T>
-    using vector_ref = Eigen::Map<vector<T>>;
-
-}} // namespace rnn::types
-
-#endif //RNNLITE_VECTOR_HPP
+    for (auto& output_edge : node.outputs()) {
+        EXPECT_FALSE(output_edge);
+    }
+}
