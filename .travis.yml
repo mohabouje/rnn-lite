@@ -13,6 +13,7 @@ matrix:
           - cmake
           - lcov
           - libgtest-dev
+          - libeigen3-dev
           sources:
           - ubuntu-toolchain-r-test
           - llvm-toolchain-trusty-5.0
