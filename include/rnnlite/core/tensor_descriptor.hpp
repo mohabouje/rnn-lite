@@ -26,53 +26,51 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: constant.hpp
+* Filename: traits.hpp
 * Author: Mohammed Boujemaoui
-* Date: 30/01/19
+* Date: 01/02/19
 */
 
-#ifndef RNNLITE_CONSTANT_HPP
-#define RNNLITE_CONSTANT_HPP
+#ifndef RNNLITE_TRAITS_HPP
+#define RNNLITE_TRAITS_HPP
 
-#include <functional>
-#include <algorithm>
+#include <vector>
 
-namespace rnn { inline namespace weight {
+namespace rnn { inline namespace core {
 
-    template <typename T>
-    struct constant_weight_initializer {
-        using value_type = T;
+    enum class data_type {
+        data = 0,
+        weight,
+        bias
+    };
+
+    struct tensor_descriptor {
+
+        template <typename... Args>
+        explicit tensor_descriptor(data_type type, Args&&... args) :
+                type_(type), shape_(std::forward<Args>(args)...) {}
 
         /**
-         * @brief Creates a constant number generator.
-         * @param fan_in Number of input weight for each neuron
-         * @param fan_out Number of output weight for each neuron
+         * @return Array describing the shape of the tensor
          */
-        constant_weight_initializer(value_type fan_in, value_type fan_out) : scale_(1) {}
-
-        /**
-         * @brief Initialize the given weights with the given constant number and scaling parameter.
-         * @tparam ForwardIt Forward iterator of the buffer containing the weights.
-         * @param first Iterator pointing to the beginning of the buffer.
-         * @param last Iterator pointing to the ending of the buffer.
-         */
-        template <typename ForwardIt>
-        void operator()(ForwardIt first, ForwardIt last) const {
-            std::fill(first, last, scale_);
+        const auto& shape() const {
+            return shape_;
         }
 
         /**
-         * @brief Updates the scaling value.
-         * @param value Scale value.
+         * @return Flag describing the type of information that the tensor stores.
+         * @see data_type
          */
-        void scale(value_type value) {
-            scale_ = value;
+        auto type() const {
+            return type_;
         }
 
     private:
-        value_type scale_;
+        data_type type_{data_type::data};
+        std::vector<std::size_t> shape_;
     };
 
-}} // namespace rnn::weight
+}}
 
-#endif //RNNLITE_CONSTANT_HPP
+
+#endif //RNNLITE_TRAITS_HPP

@@ -69,15 +69,13 @@ namespace rnn {
 
         template <typename Distribution, typename Engine = std::mt19937>
         struct RandomGeneratorImpl {
-            using value_type = typename Distribution::value_type;
             template <typename... Args>
-            explicit RandomGeneratorImpl(Args... arg) :
-                generator_(
-                    Engine(static_cast<std::size_t>(std::chrono::system_clock::now().time_since_epoch().count()))),
-                distribution_(Distribution(std::forward(arg...))) {}
+            explicit RandomGeneratorImpl(Args&&... arg) :
+                generator_(static_cast<std::size_t>(std::chrono::system_clock::now().time_since_epoch().count())),
+                distribution_(std::forward<Args>(arg)...) {}
 
-            inline value_type operator()() {
-                return static_cast<value_type>(distribution_(generator_));
+            inline auto operator()() {
+                return distribution_(generator_);
             }
 
         private:
@@ -179,7 +177,7 @@ namespace rnn {
          * @see https://en.cppreference.com/w/cpp/numeric/random
          */
         template <typename... Args>
-        explicit random_generator(Args... arg) : generator_(arg...) {}
+        explicit random_generator(Args&&... arg) : generator_(std::forward<Args>(arg)...) {}
 
         /**
          * @brief Generates a random number based in the chosen distribution.

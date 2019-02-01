@@ -91,24 +91,6 @@ namespace rnn { inline namespace core {
         }
 
         /**
-         * @brief Returns the shape of the input edge at the given index.
-         * @param index Index of the edge.
-         * @return Array representing the shape of the edge.
-         */
-        const rnn::array_view<std::size_t>& input_shape(std::size_t index) const {
-            return input_edges_[index]->shape();
-        }
-
-        /**
-         * @brief Returns the shape of the output edge at the given index.
-         * @param index Index of the edge.
-         * @return Array representing the shape of the edge.
-         */
-        rnn::array_view<long int> output_shape(std::size_t index) const {
-            return output_edges_[index]->shape();
-        }
-
-        /**
          * @brief Returns the range of the input values.
          * @return Pair of number representing the range of the input values.
          */
@@ -132,7 +114,7 @@ namespace rnn { inline namespace core {
     template <typename T>
     class edge_interface {
     public:
-        using node_ptr = std::shared_ptr<node<T>>;
+        using node_ptr = node<T>*;
 
         /**
          * @brief Creates an edge with the given configuration

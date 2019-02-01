@@ -26,53 +26,47 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 * OF THE POSSIBILITY OF SUCH DAMAGE.
 *
-* Filename: constant.hpp
+* Filename: connect.hpp
 * Author: Mohammed Boujemaoui
-* Date: 30/01/19
+* Date: 01/02/19
 */
 
-#ifndef RNNLITE_CONSTANT_HPP
-#define RNNLITE_CONSTANT_HPP
+#ifndef RNNLITE_CONNECT_HPP
+#define RNNLITE_CONNECT_HPP
 
-#include <functional>
-#include <algorithm>
+#include <rnnlite/core/layer.hpp>
 
-namespace rnn { inline namespace weight {
+namespace rnn { inline namespace core {
 
     template <typename T>
-    struct constant_weight_initializer {
-        using value_type = T;
+    inline void connect(const layer_interface<T>* head,
+                        const layer_interface<T>* tail,
+                        std::size_t head_index,
+                        std::size_t tail_index) {
+        const auto& head_shape = head->output_shape(head_index);
+        const auto& tail_shape = tail->input_shape(tail_index);
 
-        /**
-         * @brief Creates a constant number generator.
-         * @param fan_in Number of input weight for each neuron
-         * @param fan_out Number of output weight for each neuron
-         */
-        constant_weight_initializer(value_type fan_in, value_type fan_out) : scale_(1) {}
-
-        /**
-         * @brief Initialize the given weights with the given constant number and scaling parameter.
-         * @tparam ForwardIt Forward iterator of the buffer containing the weights.
-         * @param first Iterator pointing to the beginning of the buffer.
-         * @param last Iterator pointing to the ending of the buffer.
-         */
-        template <typename ForwardIt>
-        void operator()(ForwardIt first, ForwardIt last) const {
-            std::fill(first, last, scale_);
+        if (head_shape.size() != tail_shape.size()) {
+            throw std::runtime_error("Whatever");
         }
 
-        /**
-         * @brief Updates the scaling value.
-         * @param value Scale value.
-         */
-        void scale(value_type value) {
-            scale_ = value;
+        const auto& head_edge = head->output(head_index);
+        if (!head_edge) {
+            throw std::runtime_error("Another error");
         }
 
-    private:
-        value_type scale_;
+        head_edge->connect(tail);
+        tail->input(tail_index) = head_edge;
+    }
+
+    template <class Layer1, class Layer2>
+    inline void connect(const std::shared_ptr<Layer1>& head,
+                        const std::shared_ptr<Layer2>& tail,
+                        std::size_t head_index,
+                        std::size_t tail_index) {
+        connect(head.get(), tail.get(), head_index, tail_index);
     };
 
-}} // namespace rnn::weight
+}}
 
-#endif //RNNLITE_CONSTANT_HPP
+#endif //RNNLITE_CONNECT_HPP

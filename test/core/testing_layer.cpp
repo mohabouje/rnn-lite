@@ -32,6 +32,17 @@
 */
 
 #include <rnnlite/core/layer.hpp>
+#include <rnnlite/optimizer/adagrad_optimizer.hpp>
+#include <rnnlite/weight/lecun_weight_initializer.hpp>
+#include <rnnlite/weight/constant_weight_initializer.hpp>
 #include <gtest/gtest.h>
 
-TEST(Layer, DefaultLayer) {}
+TEST(Layer, DefaultLayer) {
+
+    using simple_layer = rnn::layer<float, 3, rnn::constant_weight_initializer<float>,
+            rnn::adagrad_optimizer<std::vector<float>>>;
+
+    std::vector<rnn::tensor_descriptor> input_descriptor, output_descriptor;
+    simple_layer example(input_descriptor, output_descriptor);
+
+}
