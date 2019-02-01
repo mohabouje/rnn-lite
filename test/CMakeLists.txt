@@ -22,7 +22,7 @@ set(SOURCE_FILES
         loss/testing_mse.cpp
         loss/testing_absolute.cpp)
 
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package (Eigen3 REQUIRED NO_MODULE)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} rnnlite ${GTEST_LIBRARIES} -pthread Eigen3::Eigen)
 
